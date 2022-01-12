@@ -23,14 +23,16 @@ const addTaskList = async (req: Request, res: Response, next: NextFunction) => {
     const requestParams = req.body;
 
 
-    if (!requestParams.name) {
+    console.log(requestParams);
+
+    if (!requestParams.name || !requestParams.description) {
         return res.status(400).json({
             message: 'Not enough params',
         });
     }
 
     try {
-        const result = await client.query({rowMode: 'map', text: 'insert into task_list (name, created_at) values ($1, now()) RETURNING id, name, created_at, updated_at', values: [requestParams.name]});
+        const result = await client.query({rowMode: 'map', text: 'insert into task_list (name, description, created_at) values ($1, $2, now()) RETURNING id, name, created_at, updated_at', values: [requestParams.name, requestParams.description]});
 
         console.log(result);
         return res.status(200).json({
@@ -39,6 +41,7 @@ const addTaskList = async (req: Request, res: Response, next: NextFunction) => {
 
     }
     catch (e) {
+        console.log(e);
         return res.status(500).json({
             message: e,
         });
@@ -72,14 +75,14 @@ const updateTaskList = async (req: Request, res: Response, next: NextFunction) =
 const deleteTaskList = async (req: Request, res: Response, next: NextFunction) => {
     const requestParams = req.body;
 
-    if (!requestParams.taskId) {
+    if (!requestParams.id) {
         return res.status(400).json({
             message: 'Not enough params',
         });
     }
 
     try {
-        const tasks = await client.query({rowMode: 'map', text: 'select * from task where task_list_fk = $1', values: [Number(requestParams.taskId)]});
+        const tasks = await client.query({rowMode: 'map', text: 'select * from task where task_list_fk = $1', values: [Number(requestParams.id)]});
 
         if (tasks.rows.length != 0) {
             return res.status(409).json({
@@ -87,7 +90,7 @@ const deleteTaskList = async (req: Request, res: Response, next: NextFunction) =
             });
         }
 
-        const result = await client.query({rowMode: 'map', text: 'delete from task_list WHERE id = $1', values: [Number(requestParams.taskId)]});
+        const result = await client.query({rowMode: 'map', text: 'delete from task_list WHERE id = $1', values: [Number(requestParams.id)]});
 
         return res.status(200).json({
             tasks: result.rows,
