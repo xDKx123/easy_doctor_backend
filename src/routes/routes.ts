@@ -11,7 +11,7 @@ routes.post('/addTaskList', addTaskList);
 
 
 routes.post('/getTasks', getTasks);
-routes.post('/getTasks', updateTask);
+routes.post('/updateTask', updateTask);
 routes.post('/deleteTask', deleteTask);
 routes.post('/addTask', addTask);
 

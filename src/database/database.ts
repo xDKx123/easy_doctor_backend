@@ -17,6 +17,7 @@ function configuration() {
         'user': 'postgres',
         'password': '123rainbowDash'
     }
+
     return platform() == 'win32' ? windowsConfig : linuxConfig;
 }
 
